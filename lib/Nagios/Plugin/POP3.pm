@@ -1,15 +1,13 @@
 package Nagios::Plugin::POP3;
 
+# ABSTRACT: Nagios plugin for checking POP3 Servers
+
 use warnings;
 use strict;
 use Nagios::Plugin;
 use Mail::POP3Client;
 
-=head1 NAME
-
-Nagios::Plugin::POP3 - Nagios plugin for checking POP3 Servers
-
-head1 DESCRIPTION
+=head1 DESCRIPTION
 
 Currently only two POP3 mailbox actions are supported: C<count> and C<delete>
 
@@ -25,13 +23,7 @@ Deletes all messages on the server (and returns then number deleted)
 
 =back
 
-=head1 VERSION
-
-Version 0.01
-
 =cut
-
-our $VERSION = '0.01';
 
 =head1 SYNOPSIS
 
@@ -40,15 +32,15 @@ Installs the C<nagios_plugin_pop3> command that can be used as:
     > nagios_plugin_pop3 --help
     nagios_plugin_pop3 0.01
 
-    This nagios plugin is free software, and comes with ABSOLUTELY NO WARRANTY. 
-    It may be used, redistributed and/or modified under the terms of the GNU 
+    This nagios plugin is free software, and comes with ABSOLUTELY NO WARRANTY.
+    It may be used, redistributed and/or modified under the terms of the GNU
     General Public Licence (see http://www.fsf.org/licensing/licenses/gpl.txt).
 
     Nagios plugin for POP3 mailboxes
 
     Usage: nagios_plugin_pop3 [ -v|--verbose ] [-h|--host=<host>] [-u|--user=<user>] [-p|--password=<password>] [--count] [--delete]
-    [ -c|--critical=<critical threshold> ] 
-    [ -w|--warning=<warning threshold> ]  
+    [ -c|--critical=<critical threshold> ]
+    [ -w|--warning=<warning threshold> ]
 
      -?, --usage
        Print usage information
@@ -77,7 +69,7 @@ Installs the C<nagios_plugin_pop3> command that can be used as:
 
      --count
     Count the number of messages on the server. The messages on the server are not modified.
-    This is the default action. 
+    This is the default action.
 
      --delete
     Delete all messages on the server. Counts how many messages were deleted.
@@ -102,9 +94,7 @@ get nagios to check the mailbox for a single message (and delete all messages) e
 
 =cut
 
-=head1 METHODS
-
-=head2 run
+=method run
 
 Run the plugin
 
@@ -115,10 +105,10 @@ sub run {
     my $p = Nagios::Plugin->new(
         usage => <<END_USAGE,
 Usage: %s [ -v|--verbose ] [-h|--host=<host>] [-u|--user=<user>] [-p|--password=<password>] [--count] [--delete]
-[ -c|--critical=<critical threshold> ] 
-[ -w|--warning=<warning threshold> ]  
+[ -c|--critical=<critical threshold> ]
+[ -w|--warning=<warning threshold> ]
 END_USAGE
-        version => $VERSION,
+        version => $Nagios::Plugin::POP3VERSION,
         blurb   => q{Nagios plugin for POP3 mailboxes},
         extra   => <<END_EXTRA,
 Currently only two POP3 mailbox actions are supported: count and delete
@@ -174,13 +164,13 @@ END_HELP
 POP3 password
 END_HELP
     );
-    
+
     $p->add_arg(
         spec => 'count',
         help => <<END_HELP,
 --count
 Count the number of messages on the server. The messages on the server are not modified.
-This is the default action. 
+This is the default action.
 END_HELP
     );
 
@@ -205,73 +195,22 @@ END_HELP
         HOST     => $p->opts->host,
     );
     my $count = $pop->Count;
-    $p->nagios_die("Error connecting to server: " . $p->opts->host) if $count < 0;
-    
+    $p->nagios_die( "Error connecting to server: " . $p->opts->host ) if $count < 0;
+
     for my $i ( 1 .. $count ) {
-        $pop->Delete($i) if $p->opts->delete,
+        $pop->Delete($i) if $p->opts->delete,;
     }
     $pop->Close();
 
     $p->nagios_exit(
         return_code => $p->check_threshold($count),
-        message     => 
-            ( $p->opts->delete ? 'Deleted ' : 'Counted ' )
-            . "$count message"
-            . ( $count == 1 ? "\n" : "s\n" ),
+        message => ( $p->opts->delete ? 'Deleted ' : 'Counted ' ) . "$count message" . ( $count == 1 ? "\n" : "s\n" ),
     );
 }
-
-=head1 AUTHOR
-
-Patrick Donelan, C<< <pdonelan at cpan.org> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-nagios-plugin-pop3 at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Nagios-Plugin-POP3>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Nagios::Plugin::POP3
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Nagios-Plugin-POP3>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Nagios-Plugin-POP3>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Nagios-Plugin-POP3>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Nagios-Plugin-POP3/>
-
-=back
-
 
 =head1 SEE ALSO
 
 L<Nagios::Plugin>
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2009 Patrick Donelan, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
 
 =cut
 

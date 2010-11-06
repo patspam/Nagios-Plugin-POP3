@@ -1,5 +1,7 @@
-Revision history for Nagios-Plugin-POP3
+Revision history for {{ $dist->name }}
+
+{{ $NEXT }}
+    * Updated to use Dist::Zilla
 
 0.01    Aug 3, 2009
-        First version, released on an unsuspecting world.
-
+    * First version, released on an unsuspecting world.

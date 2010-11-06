@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use lib '/projects/Nagios-Plugin-POP3/lib';
+package main;
 use Nagios::Plugin::POP3;
-
+# ABSTRACT: Run Nagios::Plugin::POP3
 Nagios::Plugin::POP3->run(@_);
